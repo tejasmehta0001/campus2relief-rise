@@ -1,8 +1,91 @@
-import { Play, Heart, Users } from "lucide-react";
+import { Play, Heart, Users, Pause } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useState, useRef } from "react";
+
+interface VideoCardProps {
+  title: string;
+  description: string;
+  videoSrc: string;
+  posterSrc?: string;
+}
+
+const VideoCard = ({ title, description, videoSrc, posterSrc }: VideoCardProps) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        videoRef.current.play();
+        setIsPlaying(true);
+      }
+    }
+  };
+
+  return (
+    <Card className="relative overflow-hidden group cursor-pointer hover:shadow-lg transition-shadow">
+      <div className="aspect-video relative">
+        <video
+          ref={videoRef}
+          className="w-full h-full object-cover"
+          poster={posterSrc}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onEnded={() => setIsPlaying(false)}
+        >
+          <source src={videoSrc} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        
+        {/* Play/Pause Overlay */}
+        <div 
+          className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors flex items-center justify-center"
+          onClick={togglePlay}
+        >
+          {isPlaying ? (
+            <Pause className="w-12 h-12 text-white drop-shadow-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+          ) : (
+            <Play className="w-12 h-12 text-white drop-shadow-lg group-hover:scale-110 transition-transform" />
+          )}
+        </div>
+        
+        {/* Video Info */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+          <h3 className="text-white font-semibold text-sm">{title}</h3>
+          <p className="text-white/80 text-xs">{description}</p>
+        </div>
+      </div>
+    </Card>
+  );
+};
 
 const EmotionalVideoSection = () => {
+  // Sample video data - in production, these would come from your CMS or API
+  const videos = [
+    {
+      title: "Communities Coming Together",
+      description: "Villages supporting each other through crisis",
+      videoSrc: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4", // Sample video URL
+      posterSrc: "/api/placeholder/640/360"
+    },
+    {
+      title: "Rebuilding Homes & Schools", 
+      description: "Infrastructure damage and recovery efforts",
+      videoSrc: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4", // Sample video URL
+      posterSrc: "/api/placeholder/640/360"
+    },
+    {
+      title: "Stories of Resilience",
+      description: "How relief efforts are creating hope", 
+      videoSrc: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_5mb.mp4", // Sample video URL
+      posterSrc: "/api/placeholder/640/360"
+    }
+  ];
+
   return (
     <section className="py-16 bg-gradient-to-br from-background to-muted">
       <div className="container mx-auto px-4">
@@ -16,41 +99,11 @@ const EmotionalVideoSection = () => {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {/* Video 1 - Community Recovery */}
-          <Card className="relative overflow-hidden group cursor-pointer hover:shadow-lg transition-shadow">
-            <div className="aspect-video bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center relative">
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-              <Play className="w-12 h-12 text-white drop-shadow-lg group-hover:scale-110 transition-transform" />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                <h3 className="text-white font-semibold text-sm">Communities Coming Together</h3>
-                <p className="text-white/80 text-xs">Villages supporting each other through crisis</p>
-              </div>
+          {videos.map((video, index) => (
+            <div key={index} className={index === 2 ? "md:col-span-2 lg:col-span-1" : ""}>
+              <VideoCard {...video} />
             </div>
-          </Card>
-
-          {/* Video 2 - Infrastructure Impact */}
-          <Card className="relative overflow-hidden group cursor-pointer hover:shadow-lg transition-shadow">
-            <div className="aspect-video bg-gradient-to-br from-orange-200 to-orange-100 flex items-center justify-center relative">
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-              <Play className="w-12 h-12 text-white drop-shadow-lg group-hover:scale-110 transition-transform" />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                <h3 className="text-white font-semibold text-sm">Rebuilding Homes & Schools</h3>
-                <p className="text-white/80 text-xs">Infrastructure damage and recovery efforts</p>
-              </div>
-            </div>
-          </Card>
-
-          {/* Video 3 - Hope Stories */}
-          <Card className="relative overflow-hidden group cursor-pointer hover:shadow-lg transition-shadow md:col-span-2 lg:col-span-1">
-            <div className="aspect-video bg-gradient-to-br from-green-200 to-green-100 flex items-center justify-center relative">
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-              <Play className="w-12 h-12 text-white drop-shadow-lg group-hover:scale-110 transition-transform" />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                <h3 className="text-white font-semibold text-sm">Stories of Resilience</h3>
-                <p className="text-white/80 text-xs">How relief efforts are creating hope</p>
-              </div>
-            </div>
-          </Card>
+          ))}
         </div>
 
         {/* Impact Stats */}
