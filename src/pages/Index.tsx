@@ -1,4 +1,5 @@
 import HeroSection from "@/components/HeroSection";
+import EmotionalVideoSection from "@/components/EmotionalVideoSection";
 import RealTimeDashboard from "@/components/RealTimeDashboard";
 import UniversityLeaderboard from "@/components/UniversityLeaderboard";
 import TransparencyWall from "@/components/TransparencyWall";
@@ -10,6 +11,7 @@ const Index = () => {
     <>
       <main className="min-h-screen">
         <HeroSection />
+        <EmotionalVideoSection />
         <RealTimeDashboard />
         <UniversityLeaderboard />
         <TransparencyWall />
